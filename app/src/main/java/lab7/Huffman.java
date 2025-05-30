@@ -9,7 +9,7 @@ public class Huffman {
     }
 
     public static void main(String[] args) { // Change to execute the given methods below
-        System.out.println(new App().getGreeting());
+        System.out.println(new Huffman().getGreeting());
     }
 
     /**
