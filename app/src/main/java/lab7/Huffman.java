@@ -3,13 +3,24 @@
  */
 package lab7;
 
-public class Huffman {
-    public String getGreeting() {
-        return "Hello World!";
-    }
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Hashtable;
+import java.util.Scanner;
 
+public class Huffman {
+
+    static Hashtable<Integer, Integer> map = new Hashtable<>();
     public static void main(String[] args) { // Change to execute the given methods below
-        System.out.println(new App().getGreeting());
+        map = new Hashtable<>();
+        String filename = args[0];
+        try {
+            Scanner scanner = new Scanner(new File(filename));
+        } catch (FileNotFoundException e) {
+            System.out.print(e);
+        }
+        
+
     }
 
     /**
@@ -20,4 +31,21 @@ public class Huffman {
      * Encoder} - Based on huff.
      * 
      */
+
+    public static void countFrequency (Scanner scan){
+        while (scan.hasNextLine()){
+            String a = scan.nextLine();
+
+            for (int i = 0; i < a.length(); i++){
+                int ascii = (int) a.charAt(i);
+                if (map.containsKey(ascii) != true){ // if key not present, add and can assume first instance
+                    map.put(ascii, 1);
+                    continue;
+                }
+                int curVal = map.get(ascii);
+                map.put(ascii, curVal + 1);
+            }
+        }
+        System.out.println(map.toString());
+    }
 }
