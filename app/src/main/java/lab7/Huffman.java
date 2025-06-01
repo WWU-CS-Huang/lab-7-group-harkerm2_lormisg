@@ -6,9 +6,28 @@ package lab7;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Huffman {
+
+    static class Node implements Comparable<Node>{
+        int key;
+        int freq;
+        Node left,right;
+
+        Node(int freq, Node left, Node right){
+            this.key = -1;
+            this.freq = freq;
+            this.left = left;
+            this.right = right;
+        }
+        @Override
+        public int compareTo(Node n){
+            return this.freq - n.freq;
+        }
+    }
+    static Hashtable<Integer, Node> nodeMap = new Hashtable<>(); //map added for the nodes for huffman tree
 
     static Hashtable<Integer, Integer> map = new Hashtable<>();
     public static void main(String[] args) { // Change to execute the given methods below
@@ -46,6 +65,52 @@ public class Huffman {
                 map.put(ascii, curVal + 1);
             }
         }
+        for (Map.Entry<Integer, Integer> entry : map.entrySet()) { //initialize a Node for each key in the map made for nodes
+            int ascii = entry.getKey();
+            int freq = entry.getValue();
+            nodeMap.put(ascii, new Node(freq, null, null));
+        }
         System.out.println(map.toString());
+    }
+    /*
+     * Returns array pair in key,value order of the key with the minimum value (frequency) then deletes the map entry
+     */
+    public static int[] getHashMin(Hashtable<Integer,Integer> m){
+        int min = Integer.MAX_VALUE; //will always be replaced
+        int minKey = 0; //also always gets replaced with an ASCII code
+        for (Map.Entry<Integer, Integer> item : m.entrySet()){
+            if (item.getValue() < min){
+                min = item.getValue();
+                minKey = item.getKey();
+            }
+        }
+        int[] a = new int[2];
+        a[0] = minKey;
+        a[1] = min;
+        map.remove(minKey);
+        return a;
+    }        
+
+/*
+ * Takes in the frequency table and uses the node hashtable to build the tree.
+ * Returns the root of the Huffman tree that was built.
+ */
+    public static Node buildTree(Hashtable<Integer,Integer> m){
+        int k = 256; //set to 256 outside of ascii range (1-255) as this is a value for an internal node used for combining the frequencies of the character nodes
+        while (m.size() > 1){ //while there's still at least two entrys to combine
+             int[] min1 = getHashMin(m);
+             int[] min2 = getHashMin(m); //returns the two minimum values since the first call deletes the original minimum
+
+             Node left = nodeMap.get(min1[0]); //gets node objects for the two smallest frequency characters/subtrees
+             Node right = nodeMap.get(min2[0]); //min1[0] and min2[0] being the ASCII keys
+
+             Node parent = new Node(min1[1]+min2[1], left, right); //parent is now the sum of the two frequencies with the two children
+             nodeMap.put(k, parent); //putting new parent into node hashTable
+             m.put(k, parent.freq); //adds parent into regular hashtable as well
+             k++; //incremented just so there is no collision, just remember that key > 255 = not a character node
+        }
+        int rootsKey = m.keys().nextElement(); //final entry, will now be the root of the Huffman tree
+        return nodeMap.get(rootsKey); //return huffman tree root
+
     }
 }
