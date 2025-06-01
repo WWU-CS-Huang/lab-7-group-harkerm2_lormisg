@@ -18,7 +18,7 @@ public class Huffman {
         Node left,right;
 
         Node(int freq, Node left, Node right){
-            this.key = -1;
+            this.key = -1; //default for nodes that represent non-characters (combination nodes in huffman)
             this.freq = freq;
             this.left = left;
             this.right = right;
@@ -28,7 +28,6 @@ public class Huffman {
             return this.freq - n.freq;
         }
     }
-    static Hashtable<Integer, Node> nodeMap = new Hashtable<>(); //map added for the nodes for huffman tree
 
     static Hashtable<Integer, Integer> map = new Hashtable<>();
     public static void main(String[] args) { // Change to execute the given methods below
@@ -88,7 +87,7 @@ public class Huffman {
     //}        
 
 /*
- * Takes in the frequency table and uses the node hashtable to build the tree.
+ * Takes in the frequency table and uses the priority queue to build the tree.
  * Returns the root of the Huffman tree that was built.
  */
     public static Node buildTree(Hashtable<Integer,Integer> m){
