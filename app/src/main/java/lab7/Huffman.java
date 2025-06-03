@@ -12,35 +12,55 @@ import java.util.Scanner;
 
 public class Huffman {
 
-    static class Node implements Comparable<Node>{
-        int key;
-        int freq;
-        Node left,right;
-
-        Node(int freq, Node left, Node right){
-            this.key = -1; //default for nodes that represent non-characters (combination nodes in huffman)
-            this.freq = freq;
-            this.left = left;
-            this.right = right;
-        }
-        @Override
-        public int compareTo(Node n){
-            return this.freq - n.freq;
-        }
-    }
-
+    static Hashtable<Integer, String> huffmanCodes = new Hashtable<>();
     static Hashtable<Integer, Integer> map = new Hashtable<>();
+    static String encode = "";
+
+
     public static void main(String[] args) { // Change to execute the given methods below
 
         map = new Hashtable<>();
         String filename = args[0];
+        Scanner scanner = null;
         try {
-            Scanner scanner = new Scanner(new File(filename));
+            scanner = new Scanner(new File(filename));
         } catch (FileNotFoundException e) {
             System.out.print(e);
         }
         
+        Huffman huffman = new Huffman();
+
+        huffman.countFrequency(scanner);
+        Node root = huffman.buildTree(map);
+        huffman.Encoder(root, "");
     }
+
+    public static void Encoder(Node root, String cur){
+        if (root == null){
+            return;
+        }
+
+        if (root.left == null && root.right == null) {
+            huffmanCodes.put(root.key, cur);
+            return;
+        }
+
+        Encoder(root.left, cur + "0");
+        Encoder(root.right, cur +"1");
+    }
+
+    public static void Encode(Scanner scan){
+        while (scan.hasNextLine()){
+            String a = scan.nextLine();
+
+            for (int i = 0; i < a.length(); i++){
+                int ascii = (int) a.charAt(i);
+                encode += huffmanCodes.get(ascii);
+            }
+        encode += huffmanCodes.get((int) '\n');
+        }
+    }
+        // 
 
     /**
      * methods:
@@ -64,6 +84,13 @@ public class Huffman {
                 int curVal = map.get(ascii);
                 map.put(ascii, curVal + 1);
             }
+            int newLine = (int) '\n';
+            if (map.containsKey(newLine) != true){
+                map.put(newLine, 1);
+            } else {
+                map.put(newLine, map.get(newLine) + 1);
+            }
+            
         }
         System.out.println(map.toString());
     }
@@ -110,4 +137,22 @@ public class Huffman {
         return pq.poll(); //final node is the root of the tree
 
     }
+
+    static class Node implements Comparable<Node>{
+        int key;
+        int freq;
+        Node left,right;
+
+        Node(int freq, Node left, Node right){
+            this.key = -1; //default for nodes that represent non-characters (combination nodes in huffman)
+            this.freq = freq;
+            this.left = left;
+            this.right = right;
+        }
+        @Override
+        public int compareTo(Node n){
+            return this.freq - n.freq;
+        }
+    }
+    
 }
