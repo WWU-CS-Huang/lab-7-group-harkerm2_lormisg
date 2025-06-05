@@ -36,11 +36,10 @@ public class Huffman {
         Node root = buildTree(map);
 
         Encoder(root,"");
-        Scanner encodeScanner = new Scanner(input);
         encode = new StringBuilder();
-        Encode(encodeScanner);
+        Encode(input);
 
-        String encodedString = encodeScanner.toString();
+        String encodedString = encode.toString();
         String decodedString = Decode(encodedString, root);
 
         if (input.length() < 100) {
@@ -71,17 +70,12 @@ public class Huffman {
         Encoder(root.right, cur +"1");
     }
 
-    public static void Encode(Scanner scan){
-        while (scan.hasNextLine()){
-            String a = scan.nextLine();
-
-            for (int i = 0; i < a.length(); i++){
-                int ascii = (int) a.charAt(i);
+    public static void Encode(String input){
+            for (int i = 0; i < input.length(); i++){
+                int ascii = (int) input.charAt(i);
                 encode.append(huffmanCodes.get(ascii));
             }
-        encode.append(huffmanCodes.get((int) '\n'));
         }
-    }
         // 
 
     /**
@@ -114,7 +108,6 @@ public class Huffman {
             }
             
         }
-        System.out.println(map.toString());
     }
 /*
  * Takes in the frequency table and uses the priority queue to build the tree.
