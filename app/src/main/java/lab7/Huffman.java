@@ -138,6 +138,25 @@ public class Huffman {
 
     }
 
+    public static String Decode(String encoded, Node root){ //pass in root of huffman tree
+        StringBuilder decoded = new StringBuilder();
+        Node cur = root;
+        for (int i = 0; i < encoded.length(); i++){
+            char bit = encoded.charAt(i);
+            if (bit=='0'){
+                cur = cur.left;
+            } else if (bit=='1'){
+                cur = cur.right;
+            }
+
+            if (cur.left==null && cur.right==null){
+                decoded.append((char) cur.key);
+                cur = root; //reset cur for decoding next char
+            }
+        }
+        return decoded.toString();
+    }
+
     static class Node implements Comparable<Node>{
         int key;
         int freq;
