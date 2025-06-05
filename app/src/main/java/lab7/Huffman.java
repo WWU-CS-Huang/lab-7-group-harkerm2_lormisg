@@ -14,25 +14,47 @@ public class Huffman {
 
     static Hashtable<Integer, String> huffmanCodes = new Hashtable<>();
     static Hashtable<Integer, Integer> map = new Hashtable<>();
-    static String encode = "";
+    static StringBuilder encode = new StringBuilder();
 
 
     public static void main(String[] args) { // Change to execute the given methods below
 
-        map = new Hashtable<>();
         String filename = args[0];
-        Scanner scanner = null;
-        try {
-            scanner = new Scanner(new File(filename));
+        StringBuilder inputBuild = new StringBuilder();
+        try (Scanner scanner = new Scanner(new File(filename))){
+            while (scanner.hasNextLine()){
+                inputBuild.append(scanner.nextLine()); //stringBuilder will now contain entire text file
+                inputBuild.append('\n');
+            }
         } catch (FileNotFoundException e) {
             System.out.print(e);
         }
-        
-        Huffman huffman = new Huffman();
+        String input = inputBuild.toString(); //convert back to string
+        Scanner freqScanner = new Scanner(input);
+        countFrequency(freqScanner); //count frequency of each char in input
 
-        huffman.countFrequency(scanner);
-        Node root = huffman.buildTree(map);
-        huffman.Encoder(root, "");
+        Node root = buildTree(map);
+
+        Encoder(root,"");
+        Scanner encodeScanner = new Scanner(input);
+        encode = new StringBuilder();
+        Encode(encodeScanner);
+
+        String encodedString = encodeScanner.toString();
+        String decodedString = Decode(encodedString, root);
+
+        if (input.length() < 100) {
+            System.out.println("Input string: " + input);
+            System.out.println("Encoded string: " + encodedString);
+            System.out.println("Decoded string: " + decodedString);
+        }
+
+        boolean equiv = input.equals(decodedString);
+        double compRatio = (double) encodedString.length() / (input.length()*8.0);
+
+        System.out.println("Decoded equals input: " + equiv);
+        System.out.println("Compression ratio: " + compRatio);
+        
     }
 
     public static void Encoder(Node root, String cur){
@@ -55,9 +77,9 @@ public class Huffman {
 
             for (int i = 0; i < a.length(); i++){
                 int ascii = (int) a.charAt(i);
-                encode += huffmanCodes.get(ascii);
+                encode.append(huffmanCodes.get(ascii));
             }
-        encode += huffmanCodes.get((int) '\n');
+        encode.append(huffmanCodes.get((int) '\n'));
         }
     }
         // 
@@ -94,25 +116,6 @@ public class Huffman {
         }
         System.out.println(map.toString());
     }
-    /*
-     * Returns array pair in key,value order of the key with the minimum value (frequency) then deletes the map entry
-     */
-    //public static int[] getHashMin(Hashtable<Integer,Integer> m){
-        //int min = Integer.MAX_VALUE; //will always be replaced
-        //int minKey = 0; //also always gets replaced with an ASCII code
-        //for (Map.Entry<Integer, Integer> item : m.entrySet()){
-          //  if (item.getValue() < min){
-            //    min = item.getValue();
-              //  minKey = item.getKey();
-            //}
-        //}
-        //int[] a = new int[2];
-        //a[0] = minKey;
-        //a[1] = min;
-        //map.remove(minKey);
-        //return a;
-    //}        
-
 /*
  * Takes in the frequency table and uses the priority queue to build the tree.
  * Returns the root of the Huffman tree that was built.
@@ -138,7 +141,7 @@ public class Huffman {
 
     }
 
-    public static String Decode(String encoded, Node root){ //pass in root of huffman tree
+    public static String Decode(String encoded, Node root){ //pass in root of huffman tree, and pass in .toString() of the encoded StringBuilder
         StringBuilder decoded = new StringBuilder();
         Node cur = root;
         for (int i = 0; i < encoded.length(); i++){
